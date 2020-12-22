@@ -1,8 +1,8 @@
-IDIR   = -I include
-LFLAGS = -ldl -lglfw
+INCLUDE = -I include
+LDFLAGS = -ldl -lglfw
 
 all: src/hello.cpp src/glad.c
-	g++ -o out/hello $(IDIR) src/hello.cpp src/glad.c $(LFLAGS)
+	g++ -o out/hello $(INCLUDE) src/hello.cpp src/glad.c $(LDFLAGS)
 
 clean:
 	rm out/*
