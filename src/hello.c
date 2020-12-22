@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -5,11 +6,17 @@
 const GLuint SCR_WIDTH = 800;
 const GLuint SCR_HEIGHT = 600;
 
-/* Triangle vertices. */
-const GLfloat vertices[] =  {
-  -0.5f, -0.5f, 0.0f,
-   0.5f, -0.5f, 0.0f,
-   0.0f,  0.5f, 0.0f
+/* Rectangle vertices. */
+const GLfloat vertices[] = {
+   0.5f,  0.5f, 0.0f,  // top right
+   0.5f, -0.5f, 0.0f,  // bottom right
+  -0.5f, -0.5f, 0.0f,  // bottom left
+  -0.5f,  0.5f, 0.0f   // top left 
+};
+
+const GLuint indices[] = {
+  0, 1, 3,  // First triangle
+  1, 2, 3   // Second triangle
 };
 
 const GLchar *vertexShaderSource
@@ -88,6 +95,12 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+  /* Initialzie EBO an buffer vertex data to GPU. */
+  GLuint EBO;
+  glGenBuffers(1, &EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
   /* Compile vertex shader. */
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -136,10 +149,13 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    /* Draws elements buffered in VAO using vertex data from the
+       corresponding VBO and indices from the EBO. Uses shaders defined
+       in shaderProgram. */
     glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
